@@ -33,7 +33,7 @@
 	</nav>
 
 	<div class="right">
-		<a href="https://github.com/sveltejs/kit">
+		<a href="https://github.com/Isl0m/blitz-record">
 			<img src={github} alt="GitHub" />
 		</a>
 	</div>
@@ -49,15 +49,11 @@
 		height: 3em;
 		width: fit-content;
 	}
-	.left > a {
+	.left a {
 		display: inline-flex;
 		gap: 0.25em;
 		width: 100%;
 		height: 100%;
-	}
-	.right {
-		width: 3em;
-		height: 3em;
 	}
 
 	.right a {
