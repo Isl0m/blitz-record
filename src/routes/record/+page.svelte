@@ -1,6 +1,21 @@
 <script lang="ts">
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	import {
+		downloadRecord,
+		getMimeTypes,
+		pauseRecord,
+		startRecord,
+		stopRecord,
+		time,
+		videoUrl
+	} from './recorder';
+	let mimeType = getMimeTypes()[0];
+	const formatTime = (time: number) =>
+		Intl.DateTimeFormat('en', {
+			minute: '2-digit',
+			second: '2-digit'
+		}).format(time * 1000);
 </script>
 
 <svelte:head>
@@ -23,6 +38,30 @@
 	<h2>
 		try editing <strong>src/routes/+page.svelte</strong>
 	</h2>
+
+	<button on:click={() => startRecord(mimeType)}>Start Record</button>
+	<button on:click={stopRecord}>Stop Record</button>
+	<button on:click={pauseRecord}>Pause Record</button>
+	<button on:click={downloadRecord}>Download Record</button>
+
+	{#if getMimeTypes().length > 1}
+		<select bind:value={mimeType}>
+			{#each getMimeTypes() as mimeType}
+				<option>{mimeType}</option>
+			{/each}
+		</select>
+	{/if}
+
+	{#if $videoUrl}
+		<!-- svelte-ignore a11y-media-has-caption -->
+		<video width={800} height={500} controls>
+			<source src={$videoUrl} type={mimeType} />
+		</video>
+	{/if}
+
+	<h1>
+		{formatTime($time)}
+	</h1>
 </section>
 
 <style>
