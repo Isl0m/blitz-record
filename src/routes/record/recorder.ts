@@ -21,43 +21,58 @@ async function getScreenAccess(options?: DisplayMediaStreamOptions) {
 	}
 }
 
-export async function startRecord(selectedMimeType: string) {
+export async function prepareToRecord(
+	selectedMimeType: string,
+	options?: DisplayMediaStreamOptions
+) {
 	mimeType = selectedMimeType;
-	const stream = await getScreenAccess({ audio: true, video: true });
+	const stream = await getScreenAccess(options);
 	if (stream) {
 		mediaRecorder = new MediaRecorder(stream, { mimeType });
-
-		mediaRecorder.start(1000);
 
 		setListeners();
 	}
 }
 
+export function startRecord() {
+	mediaRecorder?.start(1000);
+}
+
 export function pauseRecord() {
-	mediaRecorder?.pause();
+	if (mediaRecorder?.state === 'recording') {
+		mediaRecorder?.pause();
+	} else if (mediaRecorder?.state === 'paused') {
+		mediaRecorder?.resume();
+	}
 }
 
 export function stopRecord() {
 	mediaRecorder?.stop();
 }
 
-export function downloadRecord() {
-	const link = document.createElement('a');
-	let url = '';
-	videoUrl.subscribe((value) => {
-		url = value;
-	});
-	link.href = url;
-	link.download =
+export function getFileName() {
+	return (
 		Intl.DateTimeFormat('en', {
 			year: 'numeric',
 			month: '2-digit',
 			day: '2-digit',
 			hour: '2-digit',
 			minute: '2-digit'
-		}).format(new Date()) + mimeType.split('/')[1];
-	link.click();
+		}).format(new Date()) + mimeType.split('/')[1]
+	);
+}
+
+export function resetRecord() {
+	let url = '';
+	videoUrl.subscribe((val) => (url = val));
 	window.URL.revokeObjectURL(url);
+
+	if (mediaRecorder) {
+		mediaRecorder.ondataavailable = null;
+		mediaRecorder.onstop = null;
+	}
+
+	mediaRecorder = undefined;
 	recordedChunks = [];
 	time.set(0);
 }
