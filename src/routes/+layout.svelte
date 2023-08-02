@@ -12,7 +12,7 @@
 	</main>
 
 	<footer class="flex flex-col justify-center items-center sm:p-3 py-3 px-0">
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+		<p>&copy; BlitzRecord. All rights reserved.</p>
 	</footer>
 	<TailwindIndicator />
 </div>

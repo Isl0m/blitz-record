@@ -3,8 +3,8 @@
 </script>
 
 <svelte:head>
-	<title>Home | BlitzRecord</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>BlitzRecord</title>
+	<meta name="description" content="BlitzRecord is app for fast creating screen record" />
 </svelte:head>
 
 <section class="text-center">

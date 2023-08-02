@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Laptop2, Volume2 } from 'lucide-svelte';
-	import { getMimeTypes, prepareToRecord } from '../recorder';
+	import { getMimeTypes, recorder } from '../recorder';
 	import Card from '$components/ui/card/Card.svelte';
 	import CardHeader from '$components/ui/card/CardHeader.svelte';
 	import CardContent from '$components/ui/card/CardContent.svelte';
@@ -16,14 +16,14 @@
 
 	const toVideoType = (mimeType: string) => mimeType.split('/')[1];
 	const handleStart = async () => {
-		await prepareToRecord(mimeType, { video: true, audio });
+		await recorder.prepare(mimeType, { video: true, audio });
 		goto('/record');
 	};
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>Record Settings | BlitzRecord</title>
+	<meta name="description" content="Configure your record type" />
 </svelte:head>
 
 <section class="text-center">

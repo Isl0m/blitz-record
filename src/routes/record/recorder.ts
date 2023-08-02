@@ -1,14 +1,15 @@
 import { writable } from 'svelte/store';
 
-const availableMimeTypes = ['video/mp4', 'video/webm'];
 let recordedChunks: Blob[] = [];
 let mediaRecorder: MediaRecorder | undefined;
 let mimeType = '';
 
 export let time = writable(0);
 export let videoUrl = writable('');
+export let isReady = writable(false);
 
 export function getMimeTypes() {
+	const availableMimeTypes = ['video/mp4', 'video/webm'];
 	return availableMimeTypes.filter((mime) => MediaRecorder.isTypeSupported(mime));
 }
 
@@ -21,66 +22,69 @@ async function getScreenAccess(options?: DisplayMediaStreamOptions) {
 	}
 }
 
-export async function prepareToRecord(
-	selectedMimeType: string,
-	options?: DisplayMediaStreamOptions
-) {
-	mimeType = selectedMimeType;
-	const stream = await getScreenAccess(options);
-	if (stream) {
-		mediaRecorder = new MediaRecorder(stream, { mimeType });
+export const recorder = {
+	start() {
+		if (mediaRecorder?.state === 'inactive') {
+			mediaRecorder?.start(1000);
+		}
+	},
+	pause() {
+		if (mediaRecorder?.state === 'recording') {
+			mediaRecorder?.pause();
+		} else if (mediaRecorder?.state === 'paused') {
+			mediaRecorder?.resume();
+		}
+	},
+	stop() {
+		mediaRecorder?.stop();
+	},
+	reset(url: string) {
+		window.URL.revokeObjectURL(url);
+		removeListeners();
 
-		setListeners();
-	}
-}
+		mediaRecorder = undefined;
+		isReady.set(false);
+		recordedChunks = [];
+		time.set(0);
+		videoUrl.set('');
+	},
+	async prepare(selectedMimeType: string, options?: DisplayMediaStreamOptions) {
+		mimeType = selectedMimeType;
+		const stream = await getScreenAccess(options);
+		if (stream) {
+			mediaRecorder = new MediaRecorder(stream, { mimeType });
 
-export function startRecord() {
-	mediaRecorder?.start(1000);
-}
-
-export function pauseRecord() {
-	if (mediaRecorder?.state === 'recording') {
-		mediaRecorder?.pause();
-	} else if (mediaRecorder?.state === 'paused') {
-		mediaRecorder?.resume();
-	}
-}
-
-export function stopRecord() {
-	mediaRecorder?.stop();
-}
-
-export function getFileName() {
-	return (
-		Intl.DateTimeFormat('en', {
+			isReady.set(true);
+			setListeners();
+		}
+	},
+	getFileName() {
+		const date = new Date();
+		const ymd = Intl.DateTimeFormat('en', {
 			year: 'numeric',
 			month: '2-digit',
-			day: '2-digit',
+			day: '2-digit'
+		}).format(date);
+		const hm = Intl.DateTimeFormat('en', {
 			hour: '2-digit',
-			minute: '2-digit'
-		}).format(new Date()) + mimeType.split('/')[1]
-	);
-}
-
-export function resetRecord() {
-	let url = '';
-	videoUrl.subscribe((val) => (url = val));
-	window.URL.revokeObjectURL(url);
-
-	if (mediaRecorder) {
-		mediaRecorder.ondataavailable = null;
-		mediaRecorder.onstop = null;
+			minute: '2-digit',
+			hour12: false
+		}).format(date);
+		return `${ymd}/${hm}`;
 	}
-
-	mediaRecorder = undefined;
-	recordedChunks = [];
-	time.set(0);
-}
+};
 
 function setListeners() {
 	if (mediaRecorder) {
 		mediaRecorder.ondataavailable = handleDataAvailable;
 		mediaRecorder.onstop = handleOnStop;
+	}
+}
+
+function removeListeners() {
+	if (mediaRecorder) {
+		mediaRecorder.ondataavailable = null;
+		mediaRecorder.onstop = null;
 	}
 }
 
@@ -93,13 +97,7 @@ function handleDataAvailable(event: BlobEvent) {
 }
 
 function handleOnStop() {
-	if (mediaRecorder) {
-		mediaRecorder.ondataavailable = null;
-		mediaRecorder.onstop = null;
-	}
-
-	mediaRecorder = undefined;
-
+	removeListeners();
 	createUrl();
 }
 
