@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import logo from '$lib/images/svelte-logo.svg';
+	import logo from '$lib/images/logo.svg';
 	import github from '$lib/images/github.svg';
 	import { cn } from '$lib/utils';
 
@@ -22,8 +22,7 @@
 
 <header class="flex justify-between items-center container">
 	<a href="/" class="inline-flex items-center gap-2">
-		<img src={logo} width={36} height={36} alt="BlitzRecord" class="mix-blend-luminosity" />
-		<h2 class="font-bold">BlitzRecord</h2>
+		<img src={logo} height={60} width={100} alt="BlitzRecord" class="mix-blend-luminosity" />
 	</a>
 
 	<nav class="inline-flex items-center gap-4 text-foreground/60">
