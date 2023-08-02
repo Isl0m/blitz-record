@@ -56,16 +56,20 @@ export const recorder = {
 
 			isReady.set(true);
 			setListeners();
+
+			return true;
+		} else {
+			return false;
 		}
 	},
 	getFileName() {
 		const date = new Date();
-		const ymd = Intl.DateTimeFormat('en', {
+		const ymd = Intl.DateTimeFormat('us', {
 			year: 'numeric',
 			month: '2-digit',
 			day: '2-digit'
 		}).format(date);
-		const hm = Intl.DateTimeFormat('en', {
+		const hm = Intl.DateTimeFormat('us', {
 			hour: '2-digit',
 			minute: '2-digit',
 			hour12: false

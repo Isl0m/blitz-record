@@ -16,8 +16,10 @@
 
 	const toVideoType = (mimeType: string) => mimeType.split('/')[1];
 	const handleStart = async () => {
-		await recorder.prepare(mimeType, { video: true, audio });
-		goto('/record');
+		const isSuccess = await recorder.prepare(mimeType, { video: true, audio });
+		if (isSuccess) {
+			goto('/record');
+		}
 	};
 </script>
 
